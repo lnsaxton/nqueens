@@ -4,11 +4,11 @@
 #define queen int
 #endif
 
-int seq_count_conflicts(queen *queens, int boardsize, int row, int col)
+int seq_count_conflicts(__global queen *queens, int nqueens, int row, int col)
 {
   int i,j,curr[2];
   int conflicts = 0;
-  for(i=0, j=0; i<groupsize; i++, j+=2)
+  for(i=0, j=0; i<nqueens; i++, j+=2)
   {
     curr[0] = queens[j];
     curr[1] = queens[j+1];
@@ -21,7 +21,7 @@ int seq_count_conflicts(queen *queens, int boardsize, int row, int col)
   return conflicts;
 }
 
-__kernel void seq_solve(const __global queen *queens,
+__kernel void seq_solve(__global queen *queens,
     const int nqueens,
     const int max_iters) 
 {
@@ -33,30 +33,32 @@ __kernel void seq_solve(const __global queen *queens,
   {
     int row = queens[q];
     int col = queens[q+1];
-    int conflicts = count_conflicts(queens, nqueens, row, col);
-    conflicts = conflicts - nqueens;
+    int conflicts = seq_count_conflicts(queens, nqueens, row, col);
+    //conflicts = conflicts - nqueens;
     
-    if (conflicts > 0)
+    if (conflicts != nqueens+1)
     {
       CFIs = 0;
       int r = 0;
       int min_square_r;
-      int min_square_c;
-      int min_value = nqueens*boarsize;
+      //int min_square_c;
+      int min_value = nqueens*nqueens;
       for(r = 0; r < nqueens; r++)
       {
         int c;
-        c = count_conflicts(queens, nqueens, r, col);
+        c = seq_count_conflicts(queens, nqueens, r, col);
         if (c < min_value )
         {
           min_value = c;
           min_square_r = r;
         }
-        queens[q] = min_square_r;
-        queens[q+1] = col;
-       }
+      }
+      queens[q] = min_square_r;
+      //queens[q+1] = col;
     }
-    else { CFIs += CFIs + 1; }
+    else { CFIs += 1; }
+    q = (q+2)%nqueens;
+    iters += 1;
   }
 }
 
