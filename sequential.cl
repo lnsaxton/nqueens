@@ -1,0 +1,63 @@
+#pragma OPENCL EXTENSION cl_khr_global_int32_base_atomics : enable
+
+#ifndef queen
+#define queen int
+#endif
+
+int seq_count_conflicts(queen *queens, int boardsize, int row, int col)
+{
+  int i,j,curr[2];
+  int conflicts = 0;
+  for(i=0, j=0; i<groupsize; i++, j+=2)
+  {
+    curr[0] = queens[j];
+    curr[1] = queens[j+1];
+    
+    conflicts += ((row == curr[0]) || (col == curr[1]) || 
+		  (abs_diff(row,curr[0]) == abs_diff(col,curr[1])));
+    //Occupied square
+    conflicts += ((row == curr[0]) && (col == curr[1]))*nqueens;
+  }
+  return conflicts;
+}
+
+__kernel void seq_solve(const __global queen *queens,
+    const int nqueens,
+    const int max_iters) 
+{
+  int q = 0;
+  int CFIs = 0; 
+  int iters = 0;
+
+  while (CFIs < nqueens && iters < max_iters)
+  {
+    int row = queens[q];
+    int col = queens[q+1];
+    int conflicts = count_conflicts(queens, nqueens, row, col);
+    conflicts = conflicts - nqueens;
+    
+    if (conflicts > 0)
+    {
+      CFIs = 0;
+      int r = 0;
+      int min_square_r;
+      int min_square_c;
+      int min_value = nqueens*boarsize;
+      for(r = 0; r < nqueens; r++)
+      {
+        int c;
+        c = count_conflicts(queens, nqueens, r, col);
+        if (c < min_value )
+        {
+          min_value = c;
+          min_square_r = r;
+        }
+        queens[q] = min_square_r;
+        queens[q+1] = col;
+       }
+    }
+    else { CFIs += CFIs + 1; }
+  }
+}
+
+// vim: syntax=c
