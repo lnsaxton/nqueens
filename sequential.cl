@@ -57,7 +57,7 @@ __kernel void seq_solve(__global queen *queens,
       //queens[q+1] = col;
     }
     else { CFIs += 1; }
-    q = (q+2)%nqueens;
+    q = (q+2)%(2*nqueens);
     iters += 1;
   }
 }
