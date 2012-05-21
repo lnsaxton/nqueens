@@ -50,6 +50,8 @@ int main(){
   OpenCLWrapper w;
   w.enableProfiling = true;
   
+  int event_id = 0;
+  
   size_t globalWorkSize[1] = {BOARDSIZE*BOARDSIZE/LOCALSIZE};
   size_t localWorkSize[1] = {BOARDSIZE};  
 
