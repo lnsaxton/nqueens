@@ -294,7 +294,7 @@ int main(){
   //Profiling
     cl_ulong start,end,diff;
     unsigned long max=0,min=-1,total=0;
-    float avg;
+    float avg; int k;
     printf("%i events\n",event_id);
     for(k = 0; k<event_id; k++){
       w.check(clGetEventProfilingInfo(w.events[k],CL_PROFILING_COMMAND_START,
