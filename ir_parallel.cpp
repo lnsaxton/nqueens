@@ -288,7 +288,7 @@ int main(){
   }
   //Profiling
     cl_ulong start,end,diff;
-    unsigned long max=0,min=-1,total=0;
+    cl_ulong max=0,min=-1,total=0;
     float avg;
     printf("%i events\n",event_id);
     for(k = 0; k<event_id; k++){
