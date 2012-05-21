@@ -286,9 +286,14 @@ int main(){
 
 
   }
+  catch ( runtime_error& e) {
+     std::cerr << e.what() << std::endl;
+     w.cleanup();
+     return 1;    
+   }   
   //Profiling
     cl_ulong start,end,diff;
-    cl_ulong max=0,min=-1,total=0;
+    unsigned long max=0,min=-1,total=0;
     float avg;
     printf("%i events\n",event_id);
     for(k = 0; k<event_id; k++){
@@ -314,11 +319,11 @@ int main(){
     printf("Max kernel execution time: %lu ns\n",max);
     printf("Min kernel execution time: %lu ns\n",min);
     
-   catch ( runtime_error& e) {
-     std::cerr << e.what() << std::endl;
-     w.cleanup();
-     return 1;    
-   }   
+  // catch ( runtime_error& e) {
+    // std::cerr << e.what() << std::endl;
+     //w.cleanup();
+     //return 1;    
+   //}   
 
   if(done){
     printf("Solved board of size %i in %i iterations.\n",BOARDSIZE,iters);
