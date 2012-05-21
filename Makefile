@@ -6,9 +6,12 @@ SRUNX = /software/slurm/bin/srun -N1 --gres=gpu:1
 CC = gcc
 
 
-all: ir_parallel
+all: ir_parallel ir_sequential
 
 ir_parallel: ir_parallel.cpp
+	$(CXX) -o $@ $^ $(CXX_FLAGS)
+
+ir_sequential: ir_sequential.cpp
 	$(CXX) -o $@ $^ $(CXX_FLAGS)
 
 run:
