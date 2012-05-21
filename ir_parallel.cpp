@@ -48,7 +48,7 @@ int main(){
   int nqueens = BOARDSIZE,group_size=LOCALSIZE,reduce_len=REDUCE_LEN;
   int pseudo_rand;
   OpenCLWrapper w;
-  //w.enableProfiling = true;
+  w.enableProfiling = true;
   
   size_t globalWorkSize[1] = {BOARDSIZE*BOARDSIZE/LOCALSIZE};
   size_t localWorkSize[1] = {BOARDSIZE};  
@@ -283,7 +283,35 @@ int main(){
     }while(!done && iters < MAX_ITERS);
 
 
-   }
+  }
+  //Profiling
+    cl_ulong start,end,diff;
+    unsigned long max=0,min=-1,total=0;
+    float avg;
+    printf("%i events\n",event_id);
+    for(k = 0; k<event_id; k++){
+      w.check(clGetEventProfilingInfo(w.events[k],CL_PROFILING_COMMAND_START,
+				      sizeof(cl_ulong),&start,NULL),
+	      "Error getting profiling info");
+      w.check(clGetEventProfilingInfo(w.events[k],CL_PROFILING_COMMAND_END,
+				      sizeof(cl_ulong),&end,NULL),
+	      "Error getting profiling info");
+      diff = end-start;
+      total += diff;
+      avg += (float)(diff)/(float)(event_id);
+      if(diff > max){
+	max = diff;
+      }
+      if(diff < min){
+	min = diff;
+      }
+    }
+    
+    printf("Total GPU computation time: %lu ns\n",total);
+    printf("Average kernel execution time: %f ns\n",avg);
+    printf("Max kernel execution time: %lu ns\n",max);
+    printf("Min kernel execution time: %lu ns\n",min);
+    
    catch ( runtime_error& e) {
      std::cerr << e.what() << std::endl;
      w.cleanup();
